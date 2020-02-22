@@ -5,11 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Path Finder</title>
+
     <link rel="stylesheet" type="text/css" href="./main.css" />
+    <link rel="stylesheet" type="text/css" href="./bulma.min.css" />
 </head>
 
 <body>
-    <canvas id="canvas" width="600" height="600"></canvas>
+    <nav class="bd-navbar navbar has-shadow is-dark is-spaced" role="navigation" aria-label="main navigation">
+        <div class="container">
+            <div class="columns">
+                <div class="column">
+                    <button class="button is-light generate-maze">
+                        Generate New Maze
+                    </button>
+                </div>
+                <div class="column">
+                    <button class="button is-light find-path">
+                        Find Path
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <main class="bd-main">
+        <canvas id="canvas" width="600" height="600"></canvas>
+    </main>
+
+
+
     <script src="./util.js"></script>
     <script src="./main.js"></script>
 </body>

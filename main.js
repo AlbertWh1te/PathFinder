@@ -1,13 +1,20 @@
-const cellNumber = 30
-
+// const cellNumber = 9
+const cellNumber = 21
 var canvas = e("#canvas")
 var ctx = canvas.getContext("2d")
 const mazeSize = canvas.width
 
+// set up maze related
 let mazeGenerateId = 0
-let matrix = getTestMatrix()
+let findPathId = 0
+let matrix = initMatrix()
 let frontier = []
-frontier = addFrontier(0, 0, 0, 0, frontier, matrix)
+
+// set up find path related
+let found = false
+let stack = []
+let currentPosition = [0, 0]
+
 
 
 const mark = (x, y, frontier, matrix) => {
@@ -66,7 +73,7 @@ const update = () => {
 
 
 // TODO:change name
-const drawTable = (matrix) => {
+const drawTable = () => {
     const cellSize = mazeSize / cellNumber
     for (let i = 0; i < matrix.length; i++) {
         const column = matrix[i];
@@ -75,12 +82,14 @@ const drawTable = (matrix) => {
             if (cell == 1) {
                 ctx.fillStyle = "black"
                 // ctx.fillStyle = "#FF0000";
-            } else {
+            } else if (cell == 0) {
                 ctx.fillStyle = "white"
                 // ctx.fillStyle = "#228B22";
+            } else if (cell == 3) {
+                ctx.fillStyle = "blue"
             }
             ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-            if ((i == 0 && j == 0) || (j == (cellNumber - 2) && i == (cellNumber - 2))) {
+            if ((i == 0 && j == 0) || (j == (cellNumber - 1) && i == (cellNumber - 1))) {
                 ctx.fillStyle = "red"
                 ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             }
@@ -88,31 +97,108 @@ const drawTable = (matrix) => {
     }
 }
 
-function stopMazeGenerateAnimation() {
+const stopMazeGenerateAnimation = () => {
     window.clearInterval(mazeGenerateId)
     mazeGenerateId = 0
-    info("Maze Generation Finished")
+    info("Maze Generation Animation Finished")
 }
+
+const stopFindPathAnimation = () => {
+    window.clearInterval(findPathId)
+    findPathId = 0
+    info("Path find Animation Finished")
+
+}
+
 
 const mazeGenerateLoop = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     update()
-    drawTable(matrix)
+    drawTable()
 }
+
 
 const startMazeGenerate = () => {
     // Check Before Start
-    if (mazeGenerateLoop != 0) {
+    if (mazeGenerateId != 0) {
         stopMazeGenerateAnimation()
     }
+    info("Start Maze Generarion")
+    matrix = initMatrix()
+    frontier = []
+    frontier = addFrontier(0, 0, 0, 0, frontier, matrix)
     mazeGenerateId = window.setInterval(mazeGenerateLoop, 1);
 }
 
-const findPathLoop = () => {
+const pushToStack = (x, y) => {
+    if (x >= 0 && y >= 0 && x < cellNumber && y < cellNumber && matrix[y][x] != 1) {
+        stack.push([x, y])
+    }
+    return stack
+}
 
+const updatePath = () => {
+    if (found) {
+        stopFindPathAnimation()
+    }
+    currentPosition = stack.pop()
+    let x = currentPosition[0]
+    let y = currentPosition[1]
+    if (matrix[y][x] != 3) {
+        if (currentPosition[0] == (cellNumber - 1) && currentPosition[1] == (cellNumber - 1)) {
+            found = true
+        } else {
+            matrix[y][x] = 3
+            pushToStack(x - 1, y)
+            pushToStack(x + 1, y)
+            pushToStack(x, y + 1)
+            pushToStack(x, y - 1)
+        }
+    }
+}
+
+
+const findPathLoop = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    updatePath()
+    drawTable()
+}
+
+const startFindPath = () => {
+    info("Start Find Path")
+    // Check Before Start
+    if (findPathId != 0) {
+        stopFindPathAnimation()
+    }
+    if (found) {
+        matrix = resetMatrix(matrix)
+    }
+    found = false
+    stack = []
+    pushToStack(0, 0)
+    info(matrix)
+    info(stack)
+    // it means it has been runed before
+    findPathId = window.setInterval(findPathLoop, 1000 / 60);
+}
+
+const addControl = () => {
+    let generateMaze = e(".generate-maze")
+    generateMaze.addEventListener(
+        "click", () => {
+            startMazeGenerate()
+        }
+    )
+    let findPath = e(".find-path")
+    findPath.addEventListener(
+        "click", () => {
+            startFindPath()
+        }
+    )
 }
 
 const main = () => {
+    addControl()
     startMazeGenerate()
 }
 

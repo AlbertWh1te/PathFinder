@@ -5,7 +5,7 @@ const randomInt = (max) => {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
-const getTestMatrix = () => {
+const initMatrix = () => {
     let matrix = []
     for (let i = 0; i < cellNumber; i++) {
         let column = []
@@ -18,9 +18,24 @@ const getTestMatrix = () => {
     return matrix
 }
 
+// reset matrix for find path again
+const resetMatrix = (matrix) => {
+    for (let i = 0; i < matrix.length; i++) {
+        const column = matrix[i];
+        for (let j = 0; j < column.length; j++) {
+            const cell = column[j];
+            if (cell == 3) {
+                matrix[i][j] = 0
+            }
+        }
+    }
+    return matrix
+}
+
 const addFrontier = (x1, y1, x2, y2, frontier, matrix) => {
     if (x1 >= 0 && y1 >= 0 && x1 < cellNumber && y1 < cellNumber && x2 >= 0 && y2 >= 0 && x2 < cellNumber && y2 < cellNumber && (matrix[y2][x2] == 1 || matrix[y1][x1] == 1)) {
         frontier.push([x1, y1, x2, y2])
     }
     return frontier
 }
+
