@@ -1,5 +1,5 @@
 // const cellNumber = 9
-const cellNumber = 21
+const cellNumber = 31
 var canvas = e("#canvas")
 var ctx = canvas.getContext("2d")
 const mazeSize = canvas.width
@@ -182,7 +182,7 @@ const startFindPath = () => {
     stack = []
     trace = []
     pushToStack(0, 0)
-    findPathId = window.setInterval(findPathLoop, 1000 / 60);
+    findPathId = window.setInterval(findPathLoop, 1000 / 20);
 }
 
 const addControl = () => {
