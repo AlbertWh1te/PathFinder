@@ -13,7 +13,7 @@ let frontier = []
 // set up find path related
 let found = false
 let stack = []
-let currentPosition = [0, 0]
+let trace = []
 
 
 
@@ -40,8 +40,6 @@ const generateMaze = (matrix) => {
         if (matrix[toCellY][toCellX] == 1) {
             matrix[toCellY][toCellX] = 0
             matrix[cells[0]][cells[1]] = 0
-            // console.log(matrix, toCellY, toCellX, matrix[toCellX][toCellY])
-            // frontier = mark(toCellX, toCellY, frontier, matrix)
             frontier = addFrontier(toCellX - 1, toCellY, toCellX - 2, toCellY, frontier, matrix)
             frontier = addFrontier(toCellX + 1, toCellY, toCellX + 2, toCellY, frontier, matrix)
             frontier = addFrontier(toCellX, toCellY - 1, toCellX, toCellY - 2, frontier, matrix)
@@ -59,8 +57,6 @@ const update = () => {
         if (matrix[toCellY][toCellX] == 1) {
             matrix[toCellY][toCellX] = 0
             matrix[cells[0]][cells[1]] = 0
-            // console.log(matrix, toCellY, toCellX, matrix[toCellX][toCellY])
-            // frontier = mark(toCellX, toCellY, frontier, matrix)
             frontier = addFrontier(toCellX - 1, toCellY, toCellX - 2, toCellY, frontier, matrix)
             frontier = addFrontier(toCellX + 1, toCellY, toCellX + 2, toCellY, frontier, matrix)
             frontier = addFrontier(toCellX, toCellY - 1, toCellX, toCellY - 2, frontier, matrix)
@@ -87,6 +83,8 @@ const drawTable = () => {
                 // ctx.fillStyle = "#228B22";
             } else if (cell == 3) {
                 ctx.fillStyle = "blue"
+            } else if (cell == 4) {
+                ctx.fillStyle = "green"
             }
             ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             if ((i == 0 && j == 0) || (j == (cellNumber - 1) && i == (cellNumber - 1))) {
@@ -131,23 +129,29 @@ const startMazeGenerate = () => {
 }
 
 const pushToStack = (x, y) => {
-    if (x >= 0 && y >= 0 && x < cellNumber && y < cellNumber && matrix[y][x] != 1) {
-        stack.push([x, y])
+    if (x >= 0 && y >= 0 && x < cellNumber && y < cellNumber) {
+        if (matrix[y][x] == 0) {
+            stack.push([x, y])
+            trace.push([x, y])
+        }
     }
-    return stack
 }
 
 const updatePath = () => {
     if (found) {
         stopFindPathAnimation()
+        return
     }
-    currentPosition = stack.pop()
+    let currentPosition = stack.pop()
+    trace.pop()
     let x = currentPosition[0]
     let y = currentPosition[1]
     if (matrix[y][x] != 3) {
-        if (currentPosition[0] == (cellNumber - 1) && currentPosition[1] == (cellNumber - 1)) {
+        if (x == (cellNumber - 1) && y == (cellNumber - 1)) {
+            matrix = addPathToMatrix(matrix, trace)
             found = true
         } else {
+            pushToStack(x, y)
             matrix[y][x] = 3
             pushToStack(x - 1, y)
             pushToStack(x + 1, y)
@@ -172,13 +176,12 @@ const startFindPath = () => {
     }
     if (found) {
         matrix = resetMatrix(matrix)
+        stack = []
     }
     found = false
     stack = []
+    trace = []
     pushToStack(0, 0)
-    info(matrix)
-    info(stack)
-    // it means it has been runed before
     findPathId = window.setInterval(findPathLoop, 1000 / 60);
 }
 
