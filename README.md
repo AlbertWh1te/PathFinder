@@ -2,9 +2,6 @@
 
 Maze Generation And Path Finder Animation
 
-| **`Demo`** |
-
-[Check Out Online Demo](https://wh1te.org/pathfinder)
 
 | **`Maze Generation`** |
 
